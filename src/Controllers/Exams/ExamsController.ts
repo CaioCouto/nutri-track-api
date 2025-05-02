@@ -108,6 +108,41 @@ export default class ExamsController {
     }
   }
   
+  static async updateExam(request: Request, response: Response) {
+    try {
+      const { id } = request.params;
+      const { nome, unidade } = request.body;
+      const access_token = getAccessTokenFromCookie(request);
+      const supabase = createSupabaseClient(access_token);
+
+      const { data, error } = await supabase
+      .from('exames')
+      .update({ nome: nome, unidade: unidade })
+      .eq('id', parseInt(id))
+      .select();
+
+      console.log(error);
+
+      if(error) {
+        throw new DataNotFoundError('Não foi possível deletar o exame. Pois ele não existe.');
+      }
+
+      response.status(StatusCodes.OK).json(data);
+      
+    } catch (error: any) {
+      let statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
+      let message = 'Um erro interno ocorreu.';
+
+      if(error.name === 'DataNotFoundError') {
+        statusCode = StatusCodes.NOT_FOUND;
+        message = error.message;
+      }
+
+      console.log(error.message);
+      return response.status(statusCode).json({ message: message });
+    }
+  }
+  
   static async deleteExam(request: Request, response: Response) {
     try {
       const { id } = request.params;
