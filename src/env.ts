@@ -6,6 +6,7 @@ dotnev.config();
 const envSchema = z.object({
   SUPABASE_URL: z.string(),
   SUPABASE_ANON_KEY: z.string(),
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
 });
 
 export const env = envSchema.parse(process.env);

@@ -1,9 +1,9 @@
-import { createClient, QueryData } from "@supabase/supabase-js";
 import { Request, Response } from "express";
 import { UserSigninError, UserRequestLimitExceededError, UserAlreadyExistsError, UserWeakPasswordError } from "../../Classes";
 import { StatusCodes } from "http-status-codes";
 import { createSupabaseClient } from "../../utils/supabase/client";
 import { UserProfile } from "../../Types/types";
+import { env } from "../../env";
 
 
 const supabase = createSupabaseClient();
@@ -49,7 +49,8 @@ export default class UsersController {
         cookieData,  
         { 
           maxAge: sessionMaxAge, 
-          httpOnly: true 
+          httpOnly: true,
+          secure: env.NODE_ENV === 'production'
         }
       );
       response.status(StatusCodes.OK).json(responseData);
