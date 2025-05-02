@@ -26,14 +26,16 @@ export default class ExamsController {
       response.json(data);
       
     } catch (error: any) {
-      let responseStatus = StatusCodes.INTERNAL_SERVER_ERROR;
-      let responseMessage = 'Um erro interno ocorreu.'
+      let statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
+      let message = 'Um erro interno ocorreu.'
 
       if(error.name === 'DataNotFoundError') {
-        return response.status(StatusCodes.NOT_FOUND).json({ message: error.message });
+        statusCode = StatusCodes.NOT_FOUND;
+        message = error.message;
       }
 
-      return response.status(responseStatus).json({ message: responseMessage });
+      console.log(error.message);
+      return response.status(statusCode).json({ message: message });
     }
   }
   
@@ -54,12 +56,16 @@ export default class ExamsController {
 
       response.json(data);
       
-    } catch (error: any) {
+    } catch (error: any) {      
+      let statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
+      let message = 'Um erro interno ocorreu.';
+
       if(error.name === 'DataNotFoundError') {
-        return response.status(404).json({ message: error.message });
+        statusCode = StatusCodes.NOT_FOUND;
+        message = error.message;
       }
       console.log(error.message);
-      return response.status(500).json({ message: 'Um erro interno ocorreu.' });
+      return response.status(statusCode).json({ message: message });
     }
   }
   
@@ -77,8 +83,6 @@ export default class ExamsController {
       })
       .select();
 
-      console.log(error);
-
       if(error) {
         if(error.code === '23505') {
           throw new DuplicatedDataError('Exame já cadastrado.');
@@ -88,14 +92,19 @@ export default class ExamsController {
       response.json(data);
       
     } catch (error: any) {
+      let statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
+      let message = 'Um erro interno ocorreu.';
+
       if(error.name === 'DataNotFoundError') {
-        return response.status(404).json({ message: error.message });
+        statusCode = StatusCodes.NOT_FOUND;
+        message = error.message;
       }
       else if(error.name === 'DuplicatedDataError') {
-        return response.status(StatusCodes.CONFLICT).json({ message: error.message });
+        statusCode = StatusCodes.CONFLICT;
+        message = error.message;
       }
       console.log(error.message);
-      return response.status(500).json({ message: 'Um erro interno ocorreu.' });
+      return response.status(statusCode).json({ message: message });
     }
   }
   
@@ -119,11 +128,13 @@ export default class ExamsController {
       
     } catch (error: any) {
       let statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
-      let message = 'Um erro interno ocorreu.'
+      let message = 'Um erro interno ocorreu.';
+
       if(error.name === 'DataNotFoundError') {
         statusCode = StatusCodes.NOT_FOUND;
         message = error.message;
       }
+
       console.log(error.message);
       return response.status(statusCode).json({ message: message });
     }
