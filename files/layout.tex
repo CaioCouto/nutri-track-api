@@ -1,0 +1,96 @@
+\documentclass[9pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[sfdefault]{inter}
+\usepackage[portuguese]{babel}
+\usepackage{titlesec}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{cellspace}
+\usepackage{eso-pic}
+\usepackage{tikz}
+\usepackage{fontawesome5}
+
+% Cores personalizadas
+\definecolor{beige}{HTML}{866121}
+\definecolor{footerIcons}{HTML}{C1975A}
+\definecolor{marrom}{HTML}{6D4C19}
+\definecolor{begefundo}{RGB}{252,248,244}
+
+% Margens
+\geometry{
+    left=1cm,
+    right=1cm,
+    top=4cm,
+    bottom=5cm,
+    headsep=20pt,
+    footskip=30pt
+}
+
+% Remover indentação de parágrafos
+\setlength{\parindent}{0pt}
+
+% Espaço entre linhas de tabelas
+\setlength\cellspacetoplimit{8pt}
+\setlength\cellspacebottomlimit{8pt}
+\setlength{\LTpost}{5pt}
+
+% Fundo bege claro
+\pagecolor{begefundo}
+\color{black}
+
+% Logo grande ao centro (marca d'água)
+\AddToShipoutPictureBG{%
+\begin{tikzpicture}[remember picture, overlay]
+    \node[opacity=0.03, inner sep=0pt] at (current page.center) {
+        \includegraphics[width=10cm]{RB_logo_beige_no_text.png}
+    };
+\end{tikzpicture}
+}
+
+% Cabeçalho
+\fancyhf{}
+\fancyhead[C]{%
+    \begin{tikzpicture}[remember picture, overlay]
+        \node[anchor=north west, xshift=-0.10cm, yshift=-0.5cm] at (current page.north west) {
+            \includegraphics[height=6cm]{RB_logo_beige.png}
+        };
+
+        % Faixa marrom superior
+        \fill[beige] (current page.north west) rectangle ++(\paperwidth,-15pt);
+    \end{tikzpicture}
+}
+\renewcommand{\headrulewidth}{0pt}
+\setlength{\headheight}{60pt}
+\pagestyle{fancy}
+
+% Rodapé
+\fancyfoot[C]{%    
+    \begin{tikzpicture}[remember picture, overlay]
+        % Linha marrom acima do rodapé - alinhada à esquerda
+        \draw[beige, line width=3.2pt]
+            ([xshift=0cm,yshift=80px]current page.south west) -- ++(8.3cm,0);
+
+        % Faixa inferior
+        \fill[beige] (current page.south west) rectangle ++(\paperwidth,40px);
+            
+        % Informações de contato
+        \node[anchor=south west, xshift=3.8cm, yshift=50px] at (current page.south west) {
+            \textcolor{gray!50!black}{
+                \textcolor{footerIcons}{\faWhatsapp} (11) 99777-5816 \hspace{1.2cm}
+                \textcolor{footerIcons}{\faInstagram} @roscelibras \hspace{1.2cm}
+                \textcolor{footerIcons}{\faEnvelope} roscelib@gmail.com
+            }
+        };
+    \end{tikzpicture}
+}
+\renewcommand{\footrulewidth}{0pt}
+
+\begin{document}
+    \input{content.tex}
+\end{document}
