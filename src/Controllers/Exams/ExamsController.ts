@@ -1,29 +1,19 @@
-import { createClient } from "@supabase/supabase-js";
 import { Request, Response } from "express";
-import { env } from '../../env';
-import { UserSigninError, UserRequestLimitExceededError, UserAlreadyExistsError, DataNotFoundError } from "../../Classes";
-import { z } from "zod";
 import { StatusCodes } from "http-status-codes";
+import { DataNotFoundError, DuplicatedDataError } from "../../Classes";
+import { createSupabaseClient } from "../../utils/supabase/client";
 
-const SUPABASE_URL = env.SUPABASE_URL;
-const SUPABASE_ANON_KEY = env.SUPABASE_ANON_KEY;
+
+function getAccessTokenFromCookie(request: Request): string {
+  return request.cookies['sb-session'].session.access_token;
+}
 
 export default class ExamsController {
   
   static async getAll(request: Request, response: Response) {
     try {
-      const access_token = request.cookies['sb-session'].session.access_token;
-      const supabase = createClient(
-        SUPABASE_URL, 
-        SUPABASE_ANON_KEY,
-        {
-          global: {
-            headers: {
-              Authorization: `Bearer ${access_token}`
-            }
-          }
-        }
-      );
+      const access_token = getAccessTokenFromCookie(request);
+      const supabase = createSupabaseClient(access_token);
 
       const { data, error } = await supabase
       .from('exames')
@@ -50,23 +40,13 @@ export default class ExamsController {
   static async getExamById(request: Request, response: Response) {
     try {
       const { id } = request.params;
-      const access_token = request.cookies.jwt;
-      const supabase = createClient(
-        SUPABASE_URL, 
-        SUPABASE_ANON_KEY,
-        {
-          global: {
-            headers: {
-              Authorization: `Bearer ${access_token}`
-            }
-          }
-        }
-      );
+      const access_token = getAccessTokenFromCookie(request);
+      const supabase = createSupabaseClient(access_token);
 
       const { data, error } = await supabase
       .from('exames')
       .select('*, resultados_exames(*)')
-      .eq('id', id);
+      .eq('id', parseInt(id));
 
       if(!data || data?.length === 0) {
         throw new DataNotFoundError('Dados não existem.');
@@ -86,18 +66,8 @@ export default class ExamsController {
   static async createExam(request: Request, response: Response) {
     try {
       const { nome, unidade } = request.body;
-      const access_token = request.cookies.jwt;
-      const supabase = createClient(
-        SUPABASE_URL, 
-        SUPABASE_ANON_KEY,
-        {
-          global: {
-            headers: {
-              Authorization: `Bearer ${access_token}`
-            }
-          }
-        }
-      );
+      const access_token = getAccessTokenFromCookie(request);
+      const supabase = createSupabaseClient(access_token);
 
       const { data, error } = await supabase
       .from('exames')
@@ -109,15 +79,20 @@ export default class ExamsController {
 
       console.log(error);
 
-      // if(!data || data?.length === 0) {
-      //   throw new DataNotFoundError('Dados não existem.');
-      // }
+      if(error) {
+        if(error.code === '23505') {
+          throw new DuplicatedDataError('Exame já cadastrado.');
+        }
+      }
 
-      response.json({'data': 'ok'});
+      response.json(data);
       
     } catch (error: any) {
       if(error.name === 'DataNotFoundError') {
         return response.status(404).json({ message: error.message });
+      }
+      else if(error.name === 'DuplicatedDataError') {
+        return response.status(StatusCodes.CONFLICT).json({ message: error.message });
       }
       console.log(error.message);
       return response.status(500).json({ message: 'Um erro interno ocorreu.' });
