@@ -11,6 +11,7 @@ import {
 
 export {
   DataNotFoundError,
+  DuplicatedDataError,
   DietFormattingError,
   UserSigninError,
   UserWeakPasswordError,
