@@ -44,7 +44,14 @@ export default class UsersController {
         is_admin: profiles.is_admin 
       };
       
-      response.cookie('sb-session', cookieData,  { maxAge: sessionMaxAge });
+      response.cookie(
+        'sb-session', 
+        cookieData,  
+        { 
+          maxAge: sessionMaxAge, 
+          httpOnly: true 
+        }
+      );
       response.status(StatusCodes.OK).json(responseData);
       
     } catch (error: any) {
