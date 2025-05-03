@@ -1,9 +1,11 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 import { UserSigninError, UserRequestLimitExceededError, UserAlreadyExistsError, UserWeakPasswordError } from "../../Classes";
 import { StatusCodes } from "http-status-codes";
 import { createSupabaseClient } from "../../utils/supabase/client";
 import { UserProfile } from "../../Types/types";
 import { env } from "../../env";
+import { setSupabaseSessionCookie } from "../../utils/setSupabaseSessionCookie";
+import { logger } from "../../utils/logger";
 
 
 const supabase = createSupabaseClient();
@@ -19,7 +21,7 @@ export default class UsersController {
     return data as UserProfile[];
   }
 
-  static async signin(request: Request, response: Response) {
+  static signin: RequestHandler = async function(request: Request, response: Response, next?: NextFunction) {
     try {
       const { email, password, keep_logged_in } = request.body;
 
@@ -45,30 +47,25 @@ export default class UsersController {
         access_token: data.session?.access_token
       };
       
-      response.cookie(
-        'sb-session', 
-        cookieData,  
-        { 
-          maxAge: sessionMaxAge, 
-          httpOnly: true,
-          secure: env.NODE_ENV === 'production'
-        }
-      );
+      setSupabaseSessionCookie(response, cookieData, sessionMaxAge);
+
+      logger.info(`Usuário ${email} (${profiles.id}) logado com sucesso.`);
       response.status(StatusCodes.OK).json(responseData);
       
     } catch (error: any) {
       let responseStatus = StatusCodes.INTERNAL_SERVER_ERROR;
-      let responseMessage = 'Um erro interno ocorreu.'
+      let responseMessage = 'Um erro ocorreu durante o login do usuário.'
 
       if(error.name === 'UserSigninError') {
-        return response.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
+        responseStatus = StatusCodes.BAD_REQUEST;
+        responseMessage = error.message;
       }
 
-      return response.status(responseStatus).json({ message: responseMessage });
+      response.status(responseStatus).json({ message: responseMessage });
     }
   }
 
-  static async signup(request: Request, response: Response) {
+  static signup: RequestHandler = async function(request: Request, response: Response, next?: NextFunction) {
     try {
       const profiles = await UsersController.fetchUser(request.body.email);
 
@@ -76,9 +73,10 @@ export default class UsersController {
         throw new UserAlreadyExistsError('Usuário já cadastrado.');
       }
       
+      const { email, password } = request.body;
       const { data, error } = await supabase.auth.signUp({
-        email: request.body.email,
-        password: request.body.password
+        email: email,
+        password: password
       });
   
       if (error) {
@@ -90,11 +88,12 @@ export default class UsersController {
         }
       }
       
+      logger.info(`Usuário ${email} (${data?.user?.id}) registrado com sucesso.`);
       response.status(StatusCodes.OK).json(data);
       
     } catch (error: any) {
       let responseStatus = StatusCodes.INTERNAL_SERVER_ERROR;
-      let responseMessage = 'Um erro interno ocorreu.'
+      let responseMessage = 'Um erro interno ocorreu durante o cadastro de usuário.'
 
       if(
         error.name === 'UserSigninError' ||
@@ -106,21 +105,27 @@ export default class UsersController {
         responseMessage = error.message;
       }
 
-      return response.status(responseStatus).json({ message: responseMessage });
+      logger.error(error.message + '\n' + error);
+      response.status(responseStatus).json({ message: responseMessage });
     }
   }
 
-  static async signout(request: Request, response: Response) {
+  static signout: RequestHandler = async function(request: Request, response: Response, next?: NextFunction) {
     try {
       const { error } = await supabase.auth.signOut();
+      const supabaseSession = request.cookies["sb-session"];
+      const { id, email } = supabaseSession.user;
+
+      logger.info(`Usuário ${email} (${id}) registrado com sucesso.`);
       response.clearCookie('sb-session');
-      return response.status(StatusCodes.OK).json({ message: 'Usuário deslogado com sucesso.' });
+      response.status(StatusCodes.OK).json({ message: 'Usuário deslogado com sucesso.' });
 
     } catch (error: any) {
       let responseStatus = StatusCodes.INTERNAL_SERVER_ERROR;
-      let responseMessage = 'Um erro interno ocorreu.'
+      let responseMessage = 'Um erro interno ocorreu durante o logout do usuário.'
 
-      return response.status(responseStatus).json({ message: responseMessage });
+      logger.error(error.message + '\n' + error);
+      response.status(responseStatus).json({ message: responseMessage });
     }
   }
 }
