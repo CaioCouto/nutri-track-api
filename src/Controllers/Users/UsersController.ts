@@ -41,7 +41,8 @@ export default class UsersController {
       const cookieData = { ...data, cookieMaxAge: sessionMaxAge };
       const responseData = { 
         id: profiles.id, 
-        is_admin: profiles.is_admin 
+        is_admin: profiles.is_admin,
+        access_token: data.session?.access_token
       };
       
       response.cookie(
