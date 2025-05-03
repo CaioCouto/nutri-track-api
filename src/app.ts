@@ -1,5 +1,6 @@
 import express from 'express';
 import { 
+  ExamsResultsViews,
   ExamsRoutes, 
   FormatterRoutes, 
   UsersRoutes 
@@ -14,5 +15,6 @@ app.use(express.json());
 app.use(UsersRoutes);
 app.use(FormatterRoutes);
 app.use(ExamsRoutes);
+app.use(ExamsResultsViews);
 
 app.listen(3333, () => console.log('Servidor rodando na porta 3333'));
