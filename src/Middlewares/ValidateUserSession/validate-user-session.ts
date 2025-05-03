@@ -15,7 +15,8 @@ export default async function validateUserSession(request: Request, response: Re
   const { data: { user } } = await supabase.auth.getUser(access_token);
   
   if (!user) {
-    return response.status(StatusCodes.UNAUTHORIZED).json({ message: 'Usuário não autenticado.' });
+    response.status(StatusCodes.UNAUTHORIZED).json({ message: 'Usuário não autenticado.' });
+    return;
   }
 
   const { data, error } = await supabase.auth.setSession({
