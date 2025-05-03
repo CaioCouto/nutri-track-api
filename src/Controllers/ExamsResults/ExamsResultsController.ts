@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, RequestHandler, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { DataNotFoundError, DuplicatedDataError } from "../../Classes";
 import { createSupabaseClient } from "../../utils/supabase/client";
@@ -10,7 +10,7 @@ function getAccessTokenFromCookie(request: Request): string {
 
 export default class ExamsResultsController {
   
-  static async createExamResult(request: Request, response: Response) {
+  static createExamResult: RequestHandler = async function (request: Request, response: Response) {
     try {
       const access_token = getAccessTokenFromCookie(request);
       const supabase = createSupabaseClient(access_token);
@@ -20,18 +20,18 @@ export default class ExamsResultsController {
       .insert(request.body)
       .select();
 
-      return response.status(StatusCodes.OK).json(data);
+      response.status(StatusCodes.OK).json(data);
       
     } catch (error: any) {
       let statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
       let message = 'Um erro interno ocorreu.';
       
       console.log(error.message);
-      return response.status(statusCode).json({ message: message });
+      response.status(statusCode).json({ message: message });
     }
   }
   
-  static async updateExamResult(request: Request, response: Response) {
+  static updateExamResult: RequestHandler = async function (request: Request, response: Response) {
     try {
       const access_token = getAccessTokenFromCookie(request);
       const supabase = createSupabaseClient(access_token);
@@ -48,11 +48,11 @@ export default class ExamsResultsController {
       let message = 'Um erro interno ocorreu.';
 
       console.log(error.message);
-      return response.status(statusCode).json({ message: message });
+      response.status(statusCode).json({ message: message });
     }
   }
   
-  static async deleteExamResult(request: Request, response: Response) {
+  static deleteExamResult: RequestHandler = async function (request: Request, response: Response) {
     try {
       const { id } = request.params;
       const access_token = getAccessTokenFromCookie(request);
@@ -80,7 +80,7 @@ export default class ExamsResultsController {
       }
 
       console.log(error.message);
-      return response.status(statusCode).json({ message: message });
+      response.status(statusCode).json({ message: message });
     }
   }
 }

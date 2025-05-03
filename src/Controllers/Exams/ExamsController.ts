@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, RequestHandler, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { DataNotFoundError, DuplicatedDataError } from "../../Classes";
 import { createSupabaseClient } from "../../utils/supabase/client";
@@ -10,7 +10,7 @@ function getAccessTokenFromCookie(request: Request): string {
 
 export default class ExamsController {
   
-  static async getAll(request: Request, response: Response) {
+  static getAll: RequestHandler = async function (request: Request, response: Response) {
     try {
       const access_token = getAccessTokenFromCookie(request);
       const supabase = createSupabaseClient(access_token);
@@ -35,11 +35,11 @@ export default class ExamsController {
       }
 
       console.log(error.message);
-      return response.status(statusCode).json({ message: message });
+      response.status(statusCode).json({ message: message });
     }
   }
   
-  static async getExamById(request: Request, response: Response) {
+  static getExamById: RequestHandler = async function (request: Request, response: Response) {
     try {
       const { id } = request.params;
       const access_token = getAccessTokenFromCookie(request);
@@ -65,11 +65,11 @@ export default class ExamsController {
         message = error.message;
       }
       console.log(error.message);
-      return response.status(statusCode).json({ message: message });
+      response.status(statusCode).json({ message: message });
     }
   }
   
-  static async createExam(request: Request, response: Response) {
+  static createExam: RequestHandler = async function (request: Request, response: Response) {
     try {
       const { nome, unidade } = request.body;
       const access_token = getAccessTokenFromCookie(request);
@@ -104,11 +104,11 @@ export default class ExamsController {
         message = error.message;
       }
       console.log(error.message);
-      return response.status(statusCode).json({ message: message });
+      response.status(statusCode).json({ message: message });
     }
   }
   
-  static async updateExam(request: Request, response: Response) {
+  static updateExam: RequestHandler = async function (request: Request, response: Response) {
     try {
       const { id } = request.params;
       const { nome, unidade } = request.body;
@@ -139,11 +139,11 @@ export default class ExamsController {
       }
 
       console.log(error.message);
-      return response.status(statusCode).json({ message: message });
+      response.status(statusCode).json({ message: message });
     }
   }
   
-  static async deleteExam(request: Request, response: Response) {
+  static deleteExam: RequestHandler = async function (request: Request, response: Response) {
     try {
       const { id } = request.params;
       const access_token = getAccessTokenFromCookie(request);
@@ -171,7 +171,7 @@ export default class ExamsController {
       }
 
       console.log(error.message);
-      return response.status(statusCode).json({ message: message });
+      response.status(statusCode).json({ message: message });
     }
   }
 }
