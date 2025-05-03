@@ -116,7 +116,7 @@ export default class UsersController {
       const supabaseSession = request.cookies["sb-session"];
       const { id, email } = supabaseSession.user;
 
-      logger.info(`Usuário ${email} (${id}) registrado com sucesso.`);
+      logger.info(`Usuário ${email} (${id}) deslogado com sucesso.`);
       response.clearCookie('sb-session');
       response.status(StatusCodes.OK).json({ message: 'Usuário deslogado com sucesso.' });
 
