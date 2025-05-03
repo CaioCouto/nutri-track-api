@@ -2,6 +2,7 @@ import { Request, RequestHandler, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { DataNotFoundError, DuplicatedDataError } from "../../Classes";
 import { createSupabaseClient } from "../../utils/supabase/client";
+import { redis } from "../../utils/redis/client";
 
 
 function getAccessTokenFromCookie(request: Request): string {
@@ -12,6 +13,13 @@ export default class ExamsController {
   
   static getAll: RequestHandler = async function (request: Request, response: Response) {
     try {
+      const redisCache = await redis.get('all-exams');
+
+      if(redisCache) {
+        response.json(JSON.parse(redisCache));
+        return;
+      }
+
       const access_token = getAccessTokenFromCookie(request);
       const supabase = createSupabaseClient(access_token);
 
@@ -22,6 +30,8 @@ export default class ExamsController {
       if(!data || data?.length === 0) {
         throw new DataNotFoundError('Dados não existem.');
       }
+
+      await redis.set('all-exams', JSON.stringify(data), 'EX', 600);
 
       response.json(data);
       
