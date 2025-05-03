@@ -12,7 +12,7 @@ lib-cov
 *.fdb_latexmk
 
 pids
-logs
+logs/*
 results
 tmp
 
