@@ -3,6 +3,7 @@ import ExamsResultsController from "./ExamsResults";
 import FormatterController from "./Formatter";
 import PatientResultsController from "./PatientResults";
 import PatientsController from "./Patients";
+import TemplatesController from "./Templates";
 import UsersController from "./Users";
 export {
   ExamsController,
@@ -10,5 +11,6 @@ export {
   FormatterController,
   PatientsController,
   PatientResultsController,
+  TemplatesController,
   UsersController,
 };
