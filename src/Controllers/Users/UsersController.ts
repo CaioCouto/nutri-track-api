@@ -3,7 +3,6 @@ import { UserSigninError, UserRequestLimitExceededError, UserAlreadyExistsError,
 import { StatusCodes } from "http-status-codes";
 import { createSupabaseClient } from "../../utils/supabase/client";
 import { UserProfile } from "../../Types/types";
-import { env } from "../../env";
 import { setSupabaseSessionCookie } from "../../utils/setSupabaseSessionCookie";
 import { logger } from "../../utils/logger";
 
@@ -41,8 +40,7 @@ export default class UsersController {
 
       const [ profiles ] = await UsersController.fetchUser(email);
       const cookieData = { ...data, cookieMaxAge: sessionMaxAge };
-      const responseData = { 
-        id: profiles.id, 
+      const responseData = {
         is_admin: profiles.is_admin,
         access_token: data.session?.access_token
       };
