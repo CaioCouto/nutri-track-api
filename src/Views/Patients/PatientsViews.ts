@@ -4,7 +4,6 @@ import { validateUserSession } from "../../Middlewares";
 
 const router = Router();
 
-router.use(validateUserSession)
 router.get("/patients", PatientsController.getAll);
 router.get("/patients/:id", PatientsController.getPatientById);
 router.post("/patients", PatientsController.createPatient);
