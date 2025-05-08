@@ -99,6 +99,7 @@ export default class ExamsController {
         }
       }
 
+      redis.del('all-exams');
       response.json(data);
       
     } catch (error: any) {
@@ -131,13 +132,13 @@ export default class ExamsController {
       .eq('id', parseInt(id))
       .select();
 
-      console.log(error);
-
       if(error) {
         throw new DataNotFoundError('Não foi possível deletar o exame. Pois ele não existe.');
       }
 
+      redis.del('all-exams');
       response.status(StatusCodes.OK).json(data);
+      return;
       
     } catch (error: any) {
       let statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
@@ -150,6 +151,7 @@ export default class ExamsController {
 
       console.log(error.message);
       response.status(statusCode).json({ message: message });
+      return;
     }
   }
   
@@ -169,8 +171,9 @@ export default class ExamsController {
         throw new DataNotFoundError('Não foi possível deletar o exame. Pois ele não existe.');
       }
 
+      redis.del('all-exams');
       response.status(StatusCodes.OK).json(supabaseResponse.data);
-      
+      return;
     } catch (error: any) {
       let statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
       let message = 'Um erro interno ocorreu.';
