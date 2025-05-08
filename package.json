@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.8",
+    "@types/cors": "^2.8.18",
     "@types/winston": "^2.4.4",
     "supabase": "^2.22.6",
     "ts-node-dev": "^2.0.0",
