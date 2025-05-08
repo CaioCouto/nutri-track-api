@@ -33,9 +33,5 @@ COPY . .
 # Compila o TypeScript e move os templates
 RUN npm run build
 
-# Cria a pasta templates em /dist e copia os arquivos
-RUN npm mkdir -p dist/Templates && \
-    cp -r src/Templates/* dist/Templates
-
 # Define o script como ponto de entrada
 CMD ["node", "dist", "app.js"]
