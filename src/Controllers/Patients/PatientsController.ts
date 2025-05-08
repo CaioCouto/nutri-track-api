@@ -20,18 +20,23 @@ function getUserDataFromCookie(request: Request): IUserData {
   };
 }
 
+function returnAllPatientsRedisKey(userId: string): string {
+  return `all-patients-${userId}`
+}
+
 export default class PatientsController {
   
   static getAll: RequestHandler = async function (request: Request, response: Response, next?: NextFunction) {
     try {
-      const redisCache = await redis.get('all-patients');
+      const { userId, access_token} = getUserDataFromCookie(request);
+      const redisKey = returnAllPatientsRedisKey(userId);
+      const redisCache = await redis.get(redisKey);
 
       if(redisCache) {
         response.json(JSON.parse(redisCache));
         return;
       }
 
-      const { userId, access_token} = getUserDataFromCookie(request);
       const supabase = createSupabaseClient(access_token);
 
       const { data, error } = await supabase
@@ -43,7 +48,7 @@ export default class PatientsController {
         throw new DataNotFoundError('Dados não existem.');
       }
 
-      await redis.set('all-patients', JSON.stringify(data), 'EX', 600);
+      await redis.set(redisKey, JSON.stringify(data), 'EX', 600);
 
       response.status(StatusCodes.OK).json(data);
       
@@ -69,8 +74,9 @@ export default class PatientsController {
 
       const { data, error } = await supabase
       .from('pacientes')
-      .select('*, resultados_pacientes(*, exames(*))')
-      .eq('id', parseInt(id));
+      .select('*, resultados_pacientes(*, exames(*, resultados_exames(*)))')
+      .eq('id', parseInt(id))
+      .order('data_exame', { foreignTable: 'resultados_pacientes', ascending: false });
 
       if(!data || data?.length === 0) {
         throw new DataNotFoundError('Dados não existem.');
@@ -96,6 +102,7 @@ export default class PatientsController {
       const { nome, data_nascimento, sexo } = request.body as Patient;
       const { userId, access_token } = getUserDataFromCookie(request);
       const supabase = createSupabaseClient(access_token);
+      const redisKey = returnAllPatientsRedisKey(userId);
 
       const { data, error } = await supabase
       .from('pacientes')
@@ -115,6 +122,7 @@ export default class PatientsController {
         }
       }
 
+      redis.del(redisKey);  
       response.json(data);
       
     } catch (error: any) {
@@ -140,6 +148,7 @@ export default class PatientsController {
       const { nome, data_nascimento, sexo } = request.body;
       const { userId, access_token } = getUserDataFromCookie(request);
       const supabase = createSupabaseClient(access_token);
+      const redisKey = returnAllPatientsRedisKey(userId);
 
       const { data, error } = await supabase
       .from('pacientes')
@@ -158,6 +167,7 @@ export default class PatientsController {
         throw new DataNotFoundError('Não foi possível atualizar o paciente. Pois ele não existe.');
       }
 
+      redis.del(redisKey);  
       response.status(StatusCodes.OK).json(data);
       
     } catch (error: any) {
@@ -179,6 +189,7 @@ export default class PatientsController {
       const { id } = request.params;
       const { userId, access_token } = getUserDataFromCookie(request);
       const supabase = createSupabaseClient(access_token);
+      const redisKey = returnAllPatientsRedisKey(userId);
 
       const supabaseResponse = await supabase
       .from('pacientes')
@@ -190,6 +201,7 @@ export default class PatientsController {
         throw new DataNotFoundError('Não foi possível deletar o paciente, pois ele não existe.');
       }
 
+      redis.del(redisKey);
       response.status(StatusCodes.OK).json(supabaseResponse.data);
       
     } catch (error: any) {
