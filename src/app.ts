@@ -47,5 +47,5 @@ app.use(apiPrefix, PatientsRoutes);
 app.use(apiPrefix, PatientResultsRoutes);
 app.use(TemplatesRoutes);
 
-const PORT = env.API_PORT || 3333;
+const PORT = parseInt(env.API_PORT) || 3333;
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
