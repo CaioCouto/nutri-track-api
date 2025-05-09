@@ -34,4 +34,4 @@ COPY . .
 RUN npm run build
 
 # Define o script como ponto de entrada
-CMD ["node", "dist/app.js"]
+CMD ["npm", "run", "start"]
