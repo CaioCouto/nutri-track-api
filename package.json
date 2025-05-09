@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "tsnd --respawn --transpile-only src/app.ts",
     "build": "tsc && cpy \"src/Templates/**\" dist/Templates --parents",
+    "start": "cross-env NODE_ENV=production node dist/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
@@ -15,6 +16,7 @@
     "@types/cors": "^2.8.18",
     "@types/winston": "^2.4.4",
     "cpy-cli": "^5.0.0",
+    "cross-env": "^7.0.3",
     "supabase": "^2.22.6",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3"
