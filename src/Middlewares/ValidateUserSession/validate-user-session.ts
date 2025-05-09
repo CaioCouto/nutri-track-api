@@ -22,15 +22,6 @@ export default async function validateUserSession(
     const { access_token, refresh_token } = supabaseSession.session;
     const cookieMaxAge = supabaseSession.cookieMaxAge;
 
-    const {
-      data: { user },
-      error: getUserError,
-    } = await supabase.auth.getUser(access_token);
-
-    if (getUserError || !user) {
-      throw new UserNotAuthorized("Usuário não autenticado.");
-    }
-
     const { data, error: setSessionError } = await supabase.auth.setSession({
       access_token,
       refresh_token,
