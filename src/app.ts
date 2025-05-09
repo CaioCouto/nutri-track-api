@@ -13,6 +13,7 @@ import {
 import cookieParser from 'cookie-parser'
 import { validateUserSession } from './Middlewares';
 import { getTemplatesDir } from './utils/getTemplatesDir';
+import { env } from './env';
 
 const apiPrefix = '/api';
 const app = express();
@@ -46,4 +47,5 @@ app.use(apiPrefix, PatientsRoutes);
 app.use(apiPrefix, PatientResultsRoutes);
 app.use(TemplatesRoutes);
 
-app.listen(3333, () => console.log('Servidor rodando na porta 3333'));
+const PORT = env.API_PORT || 3333;
+app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
