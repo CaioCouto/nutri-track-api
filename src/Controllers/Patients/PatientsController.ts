@@ -74,7 +74,7 @@ export default class PatientsController {
 
       const { data, error } = await supabase
       .from('pacientes')
-      .select('*, resultados_pacientes!resultados_pacientes_paciente_id_fkey(*, exames(*, resultados_exames!resultados_exames_exame_id_fkey(*)))')
+      .select('*, resultados_pacientes(*, exames(*, resultados_exames(*)))')
       .eq('id', parseInt(id))
       .order('data_exame', { foreignTable: 'resultados_pacientes', ascending: false });
 
