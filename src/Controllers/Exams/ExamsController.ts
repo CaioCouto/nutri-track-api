@@ -25,7 +25,7 @@ export default class ExamsController {
 
       const { data, error } = await supabase
       .from('exames')
-      .select('*, resultados_exames(*)');
+      .select('*, resultados_exames!resultados_exames_exame_id_fkey(*)');
 
       if(!data || data?.length === 0) {
         throw new DataNotFoundError('Dados não existem.');
@@ -57,7 +57,7 @@ export default class ExamsController {
 
       const { data, error } = await supabase
       .from('exames')
-      .select('*, resultados_exames(*)')
+      .select('*, resultados_exames!resultados_exames_exame_id_fkey(*)')
       .eq('id', parseInt(id));
 
       if(!data || data?.length === 0) {
