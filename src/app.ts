@@ -24,8 +24,8 @@ app.use(cors({
   origin: [
     'http://localhost:5173',
     'http://localhost:3333',
-    'https://rosceli-web-app.sxhtn0.easypanel.host:80',
-    'https://app.roscelibras.com.br:80',
+    'https://rosceli-web-app.sxhtn0.easypanel.host',
+    'https://app.roscelibras.com.br',
   ],
   credentials: true,
   allowedHeaders: [
