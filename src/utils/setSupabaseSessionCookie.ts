@@ -6,5 +6,6 @@ export function setSupabaseSessionCookie(response: Response, cookieData: any, co
     maxAge: cookieMaxAge,
     httpOnly: true,
     secure: env.NODE_ENV === "production",
+    sameSite: env.NODE_ENV === "production" ? "none" : "lax",
   });
 }
