@@ -25,9 +25,8 @@ export default class ExamsController {
 
       const { data, error } = await supabase
       .from('exames')
-      .select('*, resultados_exames!resultados_exames_exame_id_fkey(*)');
-
-      console.log(error);
+      .select('*, resultados_exames!resultados_exames_exame_id_fkey(*)')
+      .order('nome', { ascending: true });
 
       if(!data || data?.length === 0) {
         throw new DataNotFoundError('Dados não existem.');
